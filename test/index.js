@@ -28,12 +28,9 @@ describe('Defining a class', () => {
 
     it('should add properties on the instance', () => {
       const Todo = Typesafe.defineClass({
-        properties: [
-          {
-            name: 'message',
-            type: 'string'
-          }
-        ]
+        properties: {
+          message: String
+        }
       });
       let instance = new Todo();
 
@@ -48,15 +45,11 @@ describe('Defining a class', () => {
 
     it('throws exception. Wont update property if value type is different than definition type', (done) => {
       const Todo = Typesafe.defineClass({
-        properties: [
-          {
-            name: 'message',
-            type: 'string'
-          }
-        ]
+        properties: {
+          message: String
+        }
       });
       let instance = new Todo();
-
       instance.message = 'should be added';
 
       try {
@@ -67,24 +60,59 @@ describe('Defining a class', () => {
       }
     });
 
+    describe('Supported Primitive Types', () => {
+      
+      it('supports String', () => {
+        const Todo = Typesafe.defineClass({
+          properties: {
+            message: String
+          }
+        });
+        let instance = new Todo();
+        instance.message = 'should be added';
+
+        expect(instance.message).to.equal('should be added');
+      });
+
+      it('supports Number', () => {
+        const Todo = Typesafe.defineClass({
+          properties: {
+            count: Number
+          }
+        });
+        let instance = new Todo();
+        instance.count = 33;
+
+        expect(instance.count).to.equal(33);
+      });
+
+      it('supports Boolean', () => {
+        const Todo = Typesafe.defineClass({
+          properties: {
+            done: Boolean
+          }
+        });
+        let instance = new Todo();
+        instance.done = true;
+
+        expect(instance.done).to.equal(true);
+      });
+
+    });
+
   });
 
   describe('Adding basic object properties', () => {
 
     it('creates an object property on the instance', () => {
       const Todo = Typesafe.defineClass({
-        properties: [
-          {
-            name: 'author',
-            type: 'object',
-            properties: [
-              {
-                name: 'firstName',
-                type: 'string'
-              }
-            ]
+        properties: {
+          author: {
+            properties: {
+              firstName: String
+            }
           }
-        ]
+        }
       });
       let instance = new Todo();
 
@@ -97,18 +125,13 @@ describe('Defining a class', () => {
 
     it('seals object property to prevent adding new properties', (done) => {
       const Todo = Typesafe.defineClass({
-        properties: [
-          {
-            name: 'author',
-            type: 'object',
-            properties: [
-              {
-                name: 'firstName',
-                type: 'string'
-              }
-            ]
+        properties: {
+          author: {
+            properties: {
+              firstName: String
+            }
           }
-        ]
+        }
       });
       let instance = new Todo();
 
@@ -124,18 +147,13 @@ describe('Defining a class', () => {
 
     it('throws exception. Wont update sub property if value type is different than definition type', (done) => {
       const Todo = Typesafe.defineClass({
-        properties: [
-          {
-            name: 'author',
-            type: 'object',
-            properties: [
-              {
-                name: 'firstName',
-                type: 'string'
-              }
-            ]
+        properties: {
+          author: {
+            properties: {
+              firstName: String
+            }
           }
-        ]
+        }
       });
       let instance = new Todo();
 
@@ -143,7 +161,6 @@ describe('Defining a class', () => {
         instance.author.firstName = 47;
 
         expect(Object.keys(instance.author).length).to.equal(1);
-        expect(instance.author.lastName).to.equal(undefined);
 
         done(new Error('should have thrown exception'));
       } catch(e) { done(); }
@@ -151,32 +168,19 @@ describe('Defining a class', () => {
 
     it('recurses through object property children', () => {
       const Todo = Typesafe.defineClass({
-        properties: [
-          {
-            name: 'author',
-            type: 'object',
-            properties: [
-              {
-                name: 'name',
-                type: 'object',
-                properties: [
-                  {
-                    name: 'first',
-                    type: 'string'
-                  },
-                  {
-                    name: 'last',
-                    type: 'string'
-                  }
-                ]
+        properties: {
+          author: {
+            properties: {
+              name: {
+                properties: {
+                  first: String,
+                  last: String
+                }
               },
-              {
-                name: 'age',
-                type: 'number'
-              }
-            ]
+              age: Number
+            }
           }
-        ]
+        }
       });
       let instance = new Todo();
 
@@ -192,7 +196,5 @@ describe('Defining a class', () => {
     });
 
   });
-
-  
 
 });

@@ -198,3 +198,88 @@ describe('Defining a class', () => {
   });
 
 });
+
+describe('Safely accessing properties', () => {
+
+  it('safely returns top-level property', () => {
+    const Todo = Typesafe.defineClass({
+      properties: {
+        author: {
+          properties: {
+            name: {
+              properties: {
+                first: String,
+                last: String
+              }
+            },
+            age: Number
+          }
+        }
+      }
+    });
+    let instance = new Todo();
+
+    var auth = instance.getp('author');
+
+    expect(Object.keys(auth).length).to.equal(2);
+    expect(Object.keys(auth).indexOf('name')).to.not.equal(-1);
+
+    expect(Object.keys(auth.name).length).to.equal(2);
+    expect(Object.keys(auth.name).indexOf('first')).to.not.equal(-1);
+    expect(Object.keys(auth.name).indexOf('last')).to.not.equal(-1);
+  });
+
+  it('safely returns nested property', () => {
+    const Todo = Typesafe.defineClass({
+      properties: {
+        author: {
+          properties: {
+            name: {
+              properties: {
+                first: String,
+                last: String
+              }
+            },
+            age: Number
+          }
+        }
+      }
+    });
+    let instance = new Todo();
+
+    var name = instance.getp('author.name');
+
+    expect(Object.keys(name).length).to.equal(2);
+    expect(Object.keys(name).indexOf('first')).to.not.equal(-1);
+    expect(Object.keys(name).indexOf('last')).to.not.equal(-1);
+  });
+
+  it('safely returns nested property of undefined parent', (done) => {
+    const Todo = Typesafe.defineClass({
+      properties: {
+        author: {
+          properties: {
+            name: {
+              properties: {
+                first: String,
+                last: String
+              }
+            },
+            age: Number
+          }
+        }
+      }
+    });
+    let instance = new Todo();
+
+    try {
+      var bad = instance.getp('author.dontHave.wontFind');
+
+      expect(bad).to.equal(null);
+      done();
+    } catch(e) {
+      done(e);
+    }
+  });
+
+});

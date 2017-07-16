@@ -9,32 +9,19 @@ But, what if we had a simple model creating library that would lock down objects
 
 ```
 const Todo = Typesafe.defineClass({
-  properties: [
-    {
-      name: 'author',
-      type: 'object',
-      properties: [
-        {
-          name: 'name',
-          type: 'object',
-          properties: [
-            {
-              name: 'first',
-              type: 'string'
-            },
-            {
-              name: 'last',
-              type: 'string'
-            }
-          ]
-        },
-        {
-          name: 'age',
-          type: 'number'
+  properties: {
+    author: {
+      properties: {
+        name: {
+          properties: {
+            first: String,
+            last: String
+          }
         }
-      ]
-    }
-  ]
+      }
+    },
+    age: Number
+  }
 });
 ```
 
@@ -43,12 +30,9 @@ const Todo = Typesafe.defineClass({
 Typesafe throws an exception if you try to assign a value to a property that has been defined as a different type. For example:
 ```
   const Todo = Typesafe.defineClass({
-    properties: [
-      {
-        name: 'message',
-        type: 'string'
-      }
-    ]
+    properties: {
+      message: String
+    }
   });
   let instance = new Todo();
 

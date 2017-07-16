@@ -7,6 +7,8 @@ module.exports = {
       var propName;
       var propConfig;
 
+      _createProtoFns(instance);
+
       for(var i = 0; i < properties.length; i++) {
         propName = properties[i];
         propConfig = defn.properties[propName];
@@ -21,6 +23,31 @@ module.exports = {
 
       return Object.preventExtensions(instance);
     };
+
+    /**
+     * 
+     *  Private functions 
+     * 
+     */
+
+    function _createProtoFns(obj) {
+      obj.__proto__.getp = function(objPath) {
+        var paths = objPath.split('.');
+        var obj = this;
+        var current = obj;
+
+        for(var i = 0; i < paths.length; i++) {
+          if (current[paths[i]]) {
+            current = current[paths[i]];
+          } else {
+            current = null;
+            break;
+          }
+        }
+
+        return current ? current : null;
+      }
+    }
 
     function _determineType(prop) {
       if (prop === String) {

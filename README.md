@@ -43,4 +43,24 @@ Typesafe throws an exception if you try to assign a value to a property that has
 This strategy depends on things like testing your app or code before shipping; especially when dealing with 3rd party APIs. This works since obviously a test would fail when trying to use a String like a Number.
 
 ### Error: cannot read property X of undefined?
-*** Implement `getp` function
+Ever had this error on nested properties? Maybe there's a weird case where child properties dont always exist? Typesafe handles this by safely accessing properties. Instead of doing a path, give it a path string and it will recurse down the tree of the object. If at any point it finds an undefined property, it returns null
+```
+const Todo = Typesafe.defineClass({
+  properties: {
+    author: {
+      properties: {
+        name: {
+          properties: {
+            first: String,
+            last: String
+          }
+        },
+        age: Number
+      }
+    }
+  }
+});
+let instance = new Todo();
+var bad = instance.getp('author.dontHave.wontFind');
+```
+The code above will not throw an error anymore. It will simply return null;

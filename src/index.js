@@ -37,7 +37,12 @@ module.exports = {
         var current = obj;
 
         for(var i = 0; i < paths.length; i++) {
-          if (current[paths[i]]) {
+          if (paths[i].indexOf('[') !== -1 && paths[i].indexOf(']') !== -1) {
+            var prop = paths[i].split('[')[0];
+            var idx = Number(paths[i].split('[')[1].split(']')[0]);
+
+            current = current[prop][idx];
+          } else if (current[paths[i]]) {
             current = current[paths[i]];
           } else {
             current = null;
@@ -59,6 +64,9 @@ module.exports = {
       if (prop === Boolean) {
         return 'boolean';
       }
+      if (prop === Array) {
+        return 'array';
+      }
     }
 
     function _defineProp(instance, name, config) {
@@ -72,7 +80,9 @@ module.exports = {
           return shadowVal;
         },
         set: function(value) {
-          if (typeof value === _type) {
+          if (Array.isArray(value) && _type === 'array') {
+            shadowVal = value;
+          } else if (typeof value === _type) {
             shadowVal = value;
           } else {
             throw new Error(

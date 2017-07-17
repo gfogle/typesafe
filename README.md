@@ -63,4 +63,32 @@ const Todo = Typesafe.defineClass({
 let instance = new Todo();
 var bad = instance.getp('author.dontHave.wontFind');
 ```
-The code above will not throw an error anymore. It will simply return null;
+The code above will not throw an error anymore. It will simply return null. This also works with array syntax, albeit a simple version:
+```
+const Todo = Typesafe.defineClass({
+  properties: {
+    author: {
+      properties: {
+        name: {
+          properties: {
+            first: String,
+            last: String
+          }
+        },
+        age: Number
+      }
+    }
+  }
+});
+const TodoList = Typesafe.defineClass({
+  properties: {
+    list: Array
+  }
+});
+var instance = new Todo();
+let list = new TodoList();
+
+list.list = [instance];
+
+var name = list.getp('list[0].author.name');
+```

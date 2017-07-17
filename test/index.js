@@ -98,6 +98,18 @@ describe('Defining a class', () => {
         expect(instance.done).to.equal(true);
       });
 
+      it('supports Arrays', () => {
+        const Todo = Typesafe.defineClass({
+          properties: {
+            done: Array
+          }
+        });
+        let instance = new Todo();
+        instance.done = [{ fake: 'yup'}];
+
+        expect(instance.done.length).to.equal(1);
+      });
+
     });
 
   });
@@ -280,6 +292,77 @@ describe('Safely accessing properties', () => {
     } catch(e) {
       done(e);
     }
+  });
+
+  it('safely returns top-level array index', () => {
+    const Todo = Typesafe.defineClass({
+      properties: {
+        author: {
+          properties: {
+            name: {
+              properties: {
+                first: String,
+                last: String
+              }
+            },
+            age: Number
+          }
+        }
+      }
+    });
+    const TodoList = Typesafe.defineClass({
+      properties: {
+        list: Array
+      }
+    });
+    var instance = new Todo();
+    let list = new TodoList();
+
+    list.list = [instance];
+
+    var first = list.getp('list[0]');
+
+    expect(first).to.not.equal(null);
+    expect(Object.keys(first.author).length).to.equal(2);
+    expect(Object.keys(first.author).indexOf('name')).to.not.equal(-1);
+
+    expect(Object.keys(first.author.name).length).to.equal(2);
+    expect(Object.keys(first.author.name).indexOf('first')).to.not.equal(-1);
+    expect(Object.keys(first.author.name).indexOf('last')).to.not.equal(-1);
+  });
+
+  it('safely returns top-level array index with nested properties', () => {
+    const Todo = Typesafe.defineClass({
+      properties: {
+        author: {
+          properties: {
+            name: {
+              properties: {
+                first: String,
+                last: String
+              }
+            },
+            age: Number
+          }
+        }
+      }
+    });
+    const TodoList = Typesafe.defineClass({
+      properties: {
+        list: Array
+      }
+    });
+    var instance = new Todo();
+    let list = new TodoList();
+
+    list.list = [instance];
+
+    var name = list.getp('list[0].author.name');
+
+    expect(name).to.not.equal(null);
+    expect(Object.keys(name).length).to.equal(2);
+    expect(Object.keys(name).indexOf('first')).to.not.equal(-1);
+    expect(Object.keys(name).indexOf('last')).to.not.equal(-1);
   });
 
 });

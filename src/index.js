@@ -52,6 +52,33 @@ module.exports = {
 
         return current ? current : null;
       }
+
+      obj.__proto__.setp = function(objPath, value) {
+        var paths = objPath.split('.');
+        var obj = this;
+
+        for(var i = 0; i < paths.length; i++) {
+          if (paths[i].indexOf('[') !== -1 && paths[i].indexOf(']') !== -1 && i + 1 !== paths.length) {
+            var prop = paths[i].split('[')[0];
+            var idx = Number(paths[i].split('[')[1].split(']')[0]);
+
+            obj = obj[prop][idx];
+          } else if (paths[i].indexOf('[') !== -1 && paths[i].indexOf(']') !== -1 && i + 1 === paths.length) {
+            var prop = paths[i].split('[')[0];
+            var idx = Number(paths[i].split('[')[1].split(']')[0]);
+
+            obj[prop][idx] = value;
+            break;
+          } else if (obj.hasOwnProperty(paths[i]) && i + 1 == paths.length) {
+            obj[paths[i]] = value;
+            break;
+          } else if (obj.hasOwnProperty(paths[i]) && obj[paths[i]]) {
+            obj = obj[paths[i]];
+          } else {
+            break;
+          }
+        }
+      }
     }
 
     function _determineType(prop) {

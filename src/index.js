@@ -6,6 +6,9 @@ module.exports = {
       var properties = Object.keys(defn.properties || []);
       var propName;
       var propConfig;
+      var functions = Object.keys(defn.functions || []);
+      var fnName;
+      var fnDefn;
 
       _createProtoFns(instance);
 
@@ -19,6 +22,18 @@ module.exports = {
         if (typeof defn.properties[propName] === 'object') {
           _defineObjectProp(instance, propName, propConfig);
         }
+      }
+
+      for(var j = 0; j < functions.length; j++) {
+        fnName = functions[j];
+        fnDefn = defn.functions[fnName];
+
+        if (typeof fnDefn !== 'function') {
+          throw new Error('function definitions must be functions');
+          break;
+        }
+
+        _defineFunction(instance, fnName, fnDefn);
       }
 
       return Object.preventExtensions(instance);
@@ -96,6 +111,10 @@ module.exports = {
       }
     }
 
+    function _defineFunction(instance, name, fn) {
+      instance.__proto__[name] = fn.bind(instance);
+    }
+
     function _defineProp(instance, name, config) {
       var shadowVal;
       var _type = _determineType(config);
@@ -127,6 +146,9 @@ module.exports = {
       var properties = Object.keys(config.properties || []);
       var propName;
       var propConfig;
+      var functions = Object.keys(config.functions || []);
+      var fnName;
+      var fnDefn;
 
       for(var i = 0; i < properties.length; i++) {
         propName = properties[i];
@@ -138,6 +160,18 @@ module.exports = {
         if (typeof config.properties[propName] === 'object') {
           _defineObjectProp(obj, propName, propConfig);
         }
+      }
+
+      for(var j = 0; j < functions.length; j++) {
+        fnName = functions[j];
+        fnDefn = config.functions[fnName];
+
+        if (typeof fnDefn !== 'function') {
+          throw new Error('function definitions must be functions');
+          break;
+        }
+
+        _defineFunction(obj, fnName, fnDefn);
       }
 
       Object.preventExtensions(obj);

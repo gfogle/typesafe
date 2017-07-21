@@ -209,6 +209,54 @@ describe('Defining a class', () => {
 
   });
 
+  describe('Adding function definitions', () => {
+
+    it('should add top-level functions on the instance', () => {
+      const Todo = Typesafe.defineClass({
+        properties: {
+          status: String
+        },
+        functions: {
+          complete: function() {
+            this.status = 'complete';
+          }
+        }
+      });
+      let instance = new Todo();
+
+      instance.complete();
+
+      expect(instance.status).to.equal('complete');
+    });
+
+    it('should add nested functions on the instance', () => {
+      const Todo = Typesafe.defineClass({
+        properties: {
+          author: {
+            properties: {
+              name: {
+                properties: {
+                  first: String,
+                  last: String
+                }
+              }
+            },
+            functions: {
+              getFullName: function() {
+                return this.name.first + ' ' + this.name.last;
+              }
+            }
+          }
+        }
+      });
+      let instance = new Todo();
+
+      instance.author.name.first = 'Testing';
+      instance.author.name.last = 'This';
+
+      expect(instance.author.getFullName()).to.equal('Testing This');
+    });
+  })
 });
 
 

@@ -621,3 +621,69 @@ describe('Safely assigning properties', () => {
   });
 
 });
+
+
+describe('Safely executes functions', () => {
+
+  it('safely execs top-level function', (done) => {
+    const Todo = Typesafe.defineClass({
+      properties: {
+        done: Boolean
+      },
+      functions: {
+        isDone: function() {
+          return this.done === true;
+        }
+      }
+    });
+    let instance = new Todo();
+    instance.done = false;
+
+    try {
+      expect(instance.execf('isDone')).to.equal(false);
+      done();
+    } catch(e) {
+      done(e);
+    }
+  });
+
+  it('safely execs nested function', (done) => {
+    const Todo = Typesafe.defineClass({
+      properties: {
+        author: {
+          properties: {
+            name: {
+              properties: {
+                first: String,
+                last: String
+              }
+            },
+            age: Number
+          },
+          functions: {
+            getFullName: function() {
+              return this.name.first + ' ' + this.name.last;
+            }
+          }
+        }
+      }
+    });
+    let instance = new Todo();
+
+    try {
+      instance.setp('author', {
+        name: {
+          first: 'Testing',
+          last: 'This'
+        }
+      });
+
+      expect(instance.execf('author.getFullName')).to.equal('Testing This');
+
+      done();
+    } catch(e) {
+      done(e);
+    }
+  });
+
+});

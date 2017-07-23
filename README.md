@@ -92,3 +92,43 @@ list.list = [instance];
 
 var name = list.getp('list[0].author.name');
 ```
+
+### Defining Functions
+Ok. but what if we want functions on the objects we create? Well, we can further define our class with a `functions` property:
+```
+const Todo = Typesafe.defineClass({
+  properties: {
+    done: Boolean,
+    author: {
+      properties: {
+        name: {
+          properties: {
+            first: String,
+            last: String
+          }
+        },
+        age: Number
+      },
+      functions: {
+        getFullName: function() {
+          return this.name.first + ' ' + this.name.last;
+        }
+      }
+    }
+  },
+  functions: {
+    isDone: function() {
+      return this.done === true;
+    }
+  }
+});
+let instance = new Todo();
+```
+This might seem a little more work defining `functions` and `properties` but it makes for a consistent syntax and will allow us to do some more complex runtime analysis going forward that you may find useful.
+
+### Error: cannot call X on object Y as it is not a Function
+
+Sometimes we miskey something, or a function doesnt exist on a sub-property. Though, this really shouldnt happen since you'd have caught that in development, but occasionally it does. We can mitigate this by using a safe execution function `execf` which takes a path string and if it is a function will execute it:
+```
+instance.execf('author.getFullName')
+```

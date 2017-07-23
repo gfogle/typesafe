@@ -94,6 +94,26 @@ module.exports = {
           }
         }
       }
+
+      obj.__proto__.execf = function(fnPath) {
+        var paths = fnPath.split('.');
+        var obj = this;
+
+        for(var i = 0; i < paths.length; i++) {
+          if (paths[i].indexOf('[') !== -1 && paths[i].indexOf(']') !== -1 && i + 1 !== paths.length) {
+            var prop = paths[i].split('[')[0];
+            var idx = Number(paths[i].split('[')[1].split(']')[0]);
+
+            obj = obj[prop][idx];
+          } else if (obj[paths[i]] && i + 1 == paths.length && typeof obj[paths[i]] === 'function') {
+            return obj[paths[i]].apply(obj, arguments);
+          } else if (obj.hasOwnProperty(paths[i]) && obj[paths[i]]) {
+            obj = obj[paths[i]];
+          } else {
+            break;
+          }
+        }
+      }
     }
 
     function _determineType(prop) {
@@ -112,7 +132,7 @@ module.exports = {
     }
 
     function _defineFunction(instance, name, fn) {
-      instance.__proto__[name] = fn.bind(instance);
+      instance.__proto__[name] = fn;
     }
 
     function _defineProp(instance, name, config) {

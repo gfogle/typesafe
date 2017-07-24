@@ -93,6 +93,19 @@ list.list = [instance];
 var name = list.getp('list[0].author.name');
 ```
 
+### Assigning Properties safely
+The other side to this coin is being able to safely assign properties safely. Say we're not always sure that an API won't change and we want to safely be able to add properties. Say that our author suddenly starts coming back with a `prefix` propertie with values like `Mr`, `Mrs`, etc. We could write code to safely assign that property like so:
+```
+instance.setp('author', {
+  name: {
+    prefix: 'Mr',
+    first: 'Testing',
+    last: 'This'
+  }
+});
+```
+This will simply ignore the `prefix` property since it was not on the original definition. 
+
 ### Defining Functions
 Ok. but what if we want functions on the objects we create? Well, we can further define our class with a `functions` property:
 ```

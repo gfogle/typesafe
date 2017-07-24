@@ -620,6 +620,64 @@ describe('Safely assigning properties', () => {
     expect(list.list[0].author.name.last).to.equal('fake');
   });
 
+  it('doesnt allow setting additional properties at runtime with setp', (done) => {
+    const Todo = Typesafe.defineClass({
+      properties: {
+        author: {
+          properties: {
+            name: {
+              properties: {
+                first: String,
+                last: String
+              }
+            },
+            age: Number
+          },
+          functions: {
+            getFullName: function() {
+              return this.name.first + ' ' + this.name.last;
+            }
+          }
+        }
+      }
+    });
+    let instance = new Todo();
+
+    try {
+      instance.setp('author', {
+        name: {
+          first: 'Testing',
+          last: 'This',
+          full: 'Shouldnt Exist'
+        }
+      });
+
+      expect(Object.keys(instance.author.name).length).to.equal(2);
+      expect(instance.author.name.first).to.equal('Testing');
+      expect(instance.author.name.last).to.equal('This');
+
+      done();
+    } catch(e) {
+      done(e);
+    }
+  });
+
+  it('doesnt allow setting properties at runtime with setp of different types', (done) => {
+    const TodoList = Typesafe.defineClass({
+      properties: {
+        list: Array
+      }
+    });
+    let instance = new TodoList();
+
+    try {
+      instance.setp('list', {});
+
+      done(new Error('should have thrown'));
+    } catch(e) {
+      done();
+    }
+  });
 });
 
 

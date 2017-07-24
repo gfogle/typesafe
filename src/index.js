@@ -82,10 +82,18 @@ module.exports = {
             var prop = paths[i].split('[')[0];
             var idx = Number(paths[i].split('[')[1].split(']')[0]);
 
-            obj[prop][idx] = value;
+            if (typeof value !== 'object' || (typeof value === 'object' && Array.isArray(obj[prop]))) {
+              obj[prop][idx] = value;
+            } else {
+              _copyDefined(obj[prop][idx], value);
+            }
             break;
           } else if (obj.hasOwnProperty(paths[i]) && i + 1 == paths.length) {
-            obj[paths[i]] = value;
+            if (typeof value !== 'object' || (typeof value === 'object' && Array.isArray(value))) {
+              obj[paths[i]] = value;
+            } else {
+              _copyDefined(obj[paths[i]], value);
+            }
             break;
           } else if (obj.hasOwnProperty(paths[i]) && obj[paths[i]]) {
             obj = obj[paths[i]];
@@ -114,6 +122,18 @@ module.exports = {
           }
         }
       }
+    }
+
+    function _copyDefined(defined, given) {
+      var definedProps = Object.keys(defined);
+
+      for(var i = 0; i < definedProps.length; i++) {
+        if (typeof defined[definedProps[i]] !== 'object' && given[definedProps[i]]) {
+          defined[definedProps[i]] = given[definedProps[i]];
+        } else if (typeof defined[definedProps[i]] === 'object' && given[definedProps[i]] && typeof given[definedProps[i]] === 'object') {
+          _copyDefined(defined[definedProps[i]], given[definedProps[i]])
+        }
+      }     
     }
 
     function _determineType(prop) {

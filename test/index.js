@@ -207,6 +207,57 @@ describe('Defining a class', () => {
       expect(Object.keys(instance.author.name).indexOf('last')).to.not.equal(-1);
     });
 
+    it('should not honor __proto__ on the top-level', () => {
+      const Todo = Typesafe.defineClass({
+        properties: {
+          __proto__: {
+            shouldNotExist: Boolean
+          },
+          author: {
+            properties: {
+              name: {
+                properties: {
+                  first: String,
+                  last: String
+                }
+              },
+              age: Number
+            }
+          }
+        }
+      });
+      let instance = new Todo();
+
+      expect(instance.__proto__.shouldNotExist).to.equal(undefined);
+    });
+
+    it('should not honor __proto__ on the top-level', () => {
+      const Todo = Typesafe.defineClass({
+        properties: {
+          __proto__: {
+            shouldNotExist: Boolean
+          },
+          author: {
+            properties: {
+              __proto__: {
+                shouldNotExist: Boolean
+              },
+              name: {
+                properties: {
+                  first: String,
+                  last: String
+                }
+              },
+              age: Number
+            }
+          }
+        }
+      });
+      let instance = new Todo();
+
+      expect(instance.author.__proto__.shouldNotExist).to.equal(undefined);
+    });
+
   });
 
   describe('Adding function definitions', () => {

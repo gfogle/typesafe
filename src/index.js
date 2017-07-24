@@ -16,6 +16,10 @@ module.exports = {
         propName = properties[i];
         propConfig = defn.properties[propName];
 
+        if (propName === '__proto__') {
+          continue;
+        }
+
         if (typeof defn.properties[propName] !== 'object') {
           _defineProp(instance, propName, propConfig);
         }
@@ -46,7 +50,9 @@ module.exports = {
      */
 
     function _createProtoFns(obj) {
-      obj.__proto__.getp = function(objPath) {
+      var proto = Object.getPrototypeOf(obj);
+
+      proto.getp = function(objPath) {
         var paths = objPath.split('.');
         var obj = this;
         var current = obj;
@@ -68,7 +74,7 @@ module.exports = {
         return current ? current : null;
       }
 
-      obj.__proto__.setp = function(objPath, value) {
+      proto.setp = function(objPath, value) {
         var paths = objPath.split('.');
         var obj = this;
 
@@ -103,7 +109,7 @@ module.exports = {
         }
       }
 
-      obj.__proto__.execf = function(fnPath) {
+      proto.execf = function(fnPath) {
         var paths = fnPath.split('.');
         var obj = this;
 
@@ -152,7 +158,7 @@ module.exports = {
     }
 
     function _defineFunction(instance, name, fn) {
-      instance.__proto__[name] = fn;
+      (Object.getPrototypeOf(instance))[name] = fn;
     }
 
     function _defineProp(instance, name, config) {
@@ -194,6 +200,10 @@ module.exports = {
         propName = properties[i];
         propConfig = config.properties[propName];
 
+        if (propName === '__proto__') {
+          continue;
+        }
+        
         if (typeof config.properties[propName] !== 'object') {
           _defineProp(obj, propName, propConfig);
         }
